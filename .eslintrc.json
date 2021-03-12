@@ -25,8 +25,14 @@
   ],
   "rules": {
     "prettier/prettier": "error",
+    "react/jsx-props-no-spreading": "off",
+    "react/prop-types": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
+    "import/prefer-default-export": "off",
+    "@typescript-eslint/no-use-before-define": [
+      "error"
+    ],
     "react/jsx-filename-extension": [
       1,
       {
@@ -36,9 +42,6 @@
       }
     ],
     "no-use-before-define": "off",
-    "@typescript-eslint/no-use-before-define": [
-      "error"
-    ],
     "react/react-in-jsx-scope": "off",
     "import/extensions": [
       "error",
