@@ -1,19 +1,50 @@
-import React from 'react';
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable no-console */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-empty-function */
+import React, { useCallback, useRef } from 'react';
 import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
+
+import { Form } from '@unform/web';
+import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
 
 import logoImg from '../../assets/logo.svg';
 
 import Input from '../../components/Input/index';
 import Button from '../../components/Button/index';
+import getValidationErrors from '../../utils/getValidationErrors';
 
 import { Container, Content, Background } from './styles';
 
-const SignIn: React.FC = () => (
-  <Container>
+const SignIn: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
+  console.log(formRef);
+
+  const handleSubmit = useCallback(async (data: object) => {
+    try {
+      formRef.current?.setErrors({});
+
+      const schema = Yup.object().shape({
+        email: Yup.string().required('Email required').email('Invalid email'),
+        password: Yup.string().required('Password required'),
+      });
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+    } catch (err) {
+      const errors = getValidationErrors(err);
+
+      formRef.current?.setErrors(errors);
+    }
+  }, []);
+
+  return (<Container>
     <Content>
       <img src={logoImg} alt="GoBarber" />
-      <form>
-        <h1>Faça seu login</h1>
+
+      <Form ref={formRef} onSubmit={handleSubmit}>
+        <h1>Sign in</h1>
 
         <Input name="email" icon={FiMail} placeholder="E-mail" />
         <Input
@@ -26,7 +57,7 @@ const SignIn: React.FC = () => (
         <Button type="submit">Entrar</Button>
 
         <a href="/">Esqueci minha senha</a>
-      </form>
+      </Form>
 
       <a href="/">
         <FiLogIn />
@@ -35,6 +66,7 @@ const SignIn: React.FC = () => (
     </Content>
     <Background />
   </Container>
-);
+  )
+};
 
 export default SignIn;
