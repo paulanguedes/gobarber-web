@@ -1,4 +1,5 @@
-import React, { useCallback, useRef } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useCallback, useRef, useState } from 'react';
 import { FiLogIn, FiMail } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
@@ -14,20 +15,23 @@ import getValidationErrors from '../../utils/getValidationErrors';
 import { useToast } from '../../hooks/toast';
 
 import { Container, Content, Background, AnimatedContainer } from './styles';
+import api from '../../services/apiClient';
 
 interface ForgotPasswordFormData {
   email: string;
 }
 
 const ForgotPassword: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+
   const formRef = useRef<FormHandles>(null);
 
   const { addToast } = useToast();
 
-  // const history = useHistory();
-
   const handleSubmit = useCallback(
     async (data: ForgotPasswordFormData) => {
+      setLoading(true);
+
       try {
         formRef.current?.setErrors({});
 
@@ -38,9 +42,16 @@ const ForgotPassword: React.FC = () => {
           abortEarly: false,
         });
 
-        // recuperação de senha
+        await api.post('/password/forgot', {
+          email: data.email,
+        });
 
-        // history.push('/dashboard');
+        addToast({
+          type: 'success',
+          title: 'Recovery password email sent',
+          description:
+            'We sent you an email with instructions. Check your mail.',
+        });
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
@@ -56,6 +67,8 @@ const ForgotPassword: React.FC = () => {
           description:
             'There was an error in the password recovery. Try again!',
         });
+      } finally {
+        setLoading(false);
       }
     },
     [addToast],
@@ -72,7 +85,9 @@ const ForgotPassword: React.FC = () => {
 
             <Input name="email" icon={FiMail} placeholder="E-mail" />
 
-            <Button type="submit">Recover</Button>
+            <Button loading={loading} type="submit">
+              Recover
+            </Button>
           </Form>
 
           <Link to="/signin">
