@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-console */
 import React, { createContext, useCallback, useContext, useState } from 'react';
@@ -10,14 +11,20 @@ interface SignInCredentials {
 }
 
 interface AuthContextData {
-  user: object;
+  user: User;
   signIn(credentials: SignInCredentials): Promise<void>;
   signOut(): void;
 }
 
 interface AuthState {
   token: string;
-  user: object;
+  user: User;
+}
+
+interface User {
+  id: string;
+  name: string;
+  avatar_url: string;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
