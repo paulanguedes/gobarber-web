@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useState } from 'react';
 import { FiClock, FiPower } from 'react-icons/fi';
 
 import logoImg from '../../assets/logo.svg';
@@ -12,10 +13,14 @@ import {
   Content,
   Schedule,
   NextAppointment,
+  Section,
+  Appointment,
   Calendar,
 } from './styles';
 
 const Dashboard: React.FC = () => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   const { signOut, user } = useAuth();
 
   return (
@@ -62,6 +67,60 @@ const Dashboard: React.FC = () => {
             </div>
           </NextAppointment>
         </Schedule>
+
+        <Section>
+          <strong>Manhã</strong>
+
+          <Appointment>
+            <span>
+              <FiClock />
+              08:00
+            </span>
+
+            <div>
+              <img
+                src="https://avatars.githubusercontent.com/u/60984558?v=4"
+                alt="Paula Guedes"
+              />
+              <strong>Paula Guedes</strong>
+            </div>
+          </Appointment>
+        </Section>
+
+        <Section>
+          <strong>Tarde</strong>
+
+          <Appointment>
+            <span>
+              <FiClock />
+              08:00
+            </span>
+
+            <div>
+              <img
+                src="https://avatars.githubusercontent.com/u/60984558?v=4"
+                alt="Paula Guedes"
+              />
+              <strong>Paula Guedes</strong>
+            </div>
+          </Appointment>
+
+          <Appointment>
+            <span>
+              <FiClock />
+              08:00
+            </span>
+
+            <div>
+              <img
+                src="https://avatars.githubusercontent.com/u/60984558?v=4"
+                alt="Paula Guedes"
+              />
+              <strong>Paula Guedes</strong>
+            </div>
+          </Appointment>
+        </Section>
+
         <Calendar>
           <h6>calendar</h6>
         </Calendar>
