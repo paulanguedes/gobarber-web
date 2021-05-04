@@ -162,6 +162,11 @@ export const Section = styled.section`
     padding-bottom: 16px;
     margin-bottom: 16px;
   }
+
+  p {
+    color: ${shade(0.2, '#f4ede8')};
+    font-weight: 400;
+  }
 `;
 
 export const Appointment = styled.div`
