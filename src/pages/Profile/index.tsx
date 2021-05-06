@@ -1,3 +1,6 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/ban-types */
 import React, { ChangeEvent, useCallback, useRef } from 'react';
 import { FiMail, FiLock, FiUser, FiCamera, FiArrowLeft } from 'react-icons/fi';
@@ -20,7 +23,9 @@ import { useAuth } from '../../hooks/auth';
 interface ProfileFormData {
   name: string;
   email: string;
+  old_password: string;
   password: string;
+  password_confirmation: string;
 }
 
 const Profile: React.FC = () => {
@@ -38,20 +43,54 @@ const Profile: React.FC = () => {
         const schema = Yup.object().shape({
           name: Yup.string().required('Name required'),
           email: Yup.string().required('Email required').email('Invalid email'),
-          password: Yup.string().min(6, 'Minimum of 6 digits'),
+          old_password: Yup.string(),
+          password: Yup.string().when('old_password', {
+            is: (val: any) => !!val.length,
+            then: Yup.string().required('Password required'),
+            otherwise: Yup.string(),
+          }),
+          password_confirmation: Yup.string()
+            .when('old_password', {
+              is: (val: any) => !!val.length,
+              then: Yup.string().required('Password confirmation required'),
+              otherwise: Yup.string(),
+            })
+            .oneOf([Yup.ref('password'), null], 'Password confirmation'),
         });
         await schema.validate(data, {
           abortEarly: false,
         });
 
-        await api.post('/users', data);
+        const {
+          name,
+          email,
+          old_password,
+          password,
+          password_confirmation,
+        } = data;
 
-        history.push('/');
+        const formData = {
+          name,
+          email,
+          ...(old_password
+            ? {
+              old_password,
+              password,
+              password_confirmation,
+            }
+            : {}),
+        };
+
+        const response = await api.put('/profile', formData);
+
+        updateUser(response.data);
+
+        history.push('/dashboard');
 
         addToast({
           type: 'success',
-          title: 'Registration completed',
-          description: 'You now can log on GoBarber!',
+          title: 'Updated profile!',
+          description: 'Your profile data were updated',
         });
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
@@ -64,12 +103,13 @@ const Profile: React.FC = () => {
 
         addToast({
           type: 'error',
-          title: 'Registration error',
-          description: 'An error occurred while registering. Try again!',
+          title: 'Updated profile error',
+          description:
+            'An error occurred while updating your profile. Try again!',
         });
       }
     },
-    [addToast, history],
+    [addToast, history, updateUser],
   );
 
   const handleUpdateAvatar = useCallback(
