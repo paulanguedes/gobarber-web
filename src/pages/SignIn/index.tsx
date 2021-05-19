@@ -83,14 +83,14 @@ const SignIn: React.FC = () => {
               placeholder="Password"
             />
 
-            <Button type="submit">Sign in</Button>
+            <Button type="submit">Login</Button>
 
             <Link to="/forgot-password">Forgot my password</Link>
           </Form>
 
           <Link to="/signup">
             <FiLogIn />
-            Criar conta
+            Sign up
           </Link>
         </AnimatedContainer>
       </Content>
