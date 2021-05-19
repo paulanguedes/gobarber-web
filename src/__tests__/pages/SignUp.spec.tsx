@@ -1,9 +1,9 @@
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react';
-import SignIn from '../../pages/SignIn';
+import SignUp from '../../pages/SignUp';
 
 const mockedHistoryPush = jest.fn();
-const mockedSignIn = jest.fn();
+const mockedSignUp = jest.fn();
 const mockedAddToast = jest.fn();
 
 jest.mock('react-router-dom', () => {
@@ -15,14 +15,6 @@ jest.mock('react-router-dom', () => {
   };
 });
 
-jest.mock('../../hooks/auth', () => {
-  return {
-    useAuth: () => ({
-      signIn: mockedSignIn,
-    }),
-  };
-});
-
 jest.mock('../../hooks/toast', () => {
   return {
     useToast: () => ({
@@ -31,35 +23,39 @@ jest.mock('../../hooks/toast', () => {
   };
 });
 
-describe('SignIn Page', () => {
+describe('SignUp Page', () => {
   beforeEach(() => {
     mockedHistoryPush.mockClear();
   });
 
-  it('should be able to sign in', async () => {
-    const { getByPlaceholderText, getByText } = render(<SignIn />);
+  it('should be able to sign up', async () => {
+    const { getByPlaceholderText, getByText } = render(<SignUp />);
 
+    const nameField = getByPlaceholderText('Name');
     const emailField = getByPlaceholderText('Email');
     const passwordField = getByPlaceholderText('Password');
-    const buttonElement = getByText('Login');
+    const buttonElement = getByText('Submit');
 
+    fireEvent.change(nameField, { target: { value: 'Jane Doe' } });
     fireEvent.change(emailField, { target: { value: 'janedoe@exemplo.com' } });
     fireEvent.change(passwordField, { target: { value: '123456' } });
 
     fireEvent.click(buttonElement);
 
     await waitFor(() => {
-      expect(mockedHistoryPush).toHaveBeenCalledWith('/dashboard');
+      expect(mockedHistoryPush).toHaveBeenCalledWith('/');
     });
   });
 
-  it('should not be able to sign in with wrong email', async () => {
-    const { getByPlaceholderText, getByText } = render(<SignIn />);
+  it('should not be able to sign up with wrong email', async () => {
+    const { getByPlaceholderText, getByText } = render(<SignUp />);
 
+    const nameField = getByPlaceholderText('Name');
     const emailField = getByPlaceholderText('Email');
     const passwordField = getByPlaceholderText('Password');
-    const buttonElement = getByText('Login');
+    const buttonElement = getByText('Submit');
 
+    fireEvent.change(nameField, { target: { value: 'Jane Doe' } });
     fireEvent.change(emailField, {
       target: { value: 'wrong_janedoe@exemplo.com' },
     });
@@ -72,17 +68,38 @@ describe('SignIn Page', () => {
     });
   });
 
-  it('should display an error if login fails', async () => {
-    mockedSignIn.mockImplementation(() => {
+  it('should not be able to sign up without a valid password', async () => {
+    const { getByPlaceholderText, getByText } = render(<SignUp />);
+
+    const nameField = getByPlaceholderText('Name');
+    const emailField = getByPlaceholderText('Email');
+    const passwordField = getByPlaceholderText('Password');
+    const buttonElement = getByText('Submit');
+
+    fireEvent.change(nameField, { target: { value: 'Jane Doe' } });
+    fireEvent.change(emailField, { target: { value: 'janedoe@exemplo.com' } });
+    fireEvent.change(passwordField, { target: { value: '12345' } });
+
+    fireEvent.click(buttonElement);
+
+    await waitFor(() => {
+      expect(mockedHistoryPush).not.toHaveBeenCalled();
+    });
+  });
+
+  it('should display an error if submit fails', async () => {
+    mockedSignUp.mockImplementation(() => {
       throw new Error();
     });
 
-    const { getByPlaceholderText, getByText } = render(<SignIn />);
+    const { getByPlaceholderText, getByText } = render(<SignUp />);
 
+    const nameField = getByPlaceholderText('Name');
     const emailField = getByPlaceholderText('Email');
     const passwordField = getByPlaceholderText('Password');
-    const buttonElement = getByText('Login');
+    const buttonElement = getByText('Submit');
 
+    fireEvent.change(nameField, { target: { value: 'Jane Doe' } });
     fireEvent.change(emailField, {
       target: { value: 'janedoe@exemplo.com' },
     });
